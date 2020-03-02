@@ -1,4 +1,6 @@
 /*
+ * Modified by: playHing <https://github.com/playHing>
+
  * Copyright (c) 2016 Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
@@ -26,10 +28,8 @@ import (
 	"archive/zip"
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -111,43 +111,6 @@ func (terms dbTermList) crush() dbRecordList {
 			t.Glossary,
 			t.Sequence,
 			strings.Join(t.TermTags, " "),
-		}
-
-		results = append(results, result)
-	}
-
-	return results
-}
-
-type dbKanji struct {
-	Character string
-	Onyomi    []string
-	Kunyomi   []string
-	Tags      []string
-	Meanings  []string
-	Stats     map[string]string
-}
-
-type dbKanjiList []dbKanji
-
-func (kanji *dbKanji) addTags(tags ...string) {
-	for _, tag := range tags {
-		if !hasString(tag, kanji.Tags) {
-			kanji.Tags = append(kanji.Tags, tag)
-		}
-	}
-}
-
-func (kanji dbKanjiList) crush() dbRecordList {
-	var results dbRecordList
-	for _, k := range kanji {
-		result := dbRecord{
-			k.Character,
-			strings.Join(k.Onyomi, " "),
-			strings.Join(k.Kunyomi, " "),
-			strings.Join(k.Tags, " "),
-			k.Meanings,
-			k.Stats,
 		}
 
 		results = append(results, result)
@@ -266,48 +229,9 @@ func hasString(needle string, haystack []string) bool {
 	return false
 }
 
-func detectFormat(path string) (string, error) {
-	switch filepath.Ext(path) {
-	case ".sqlite":
-		return "rikai", nil
-	case ".kanjifreq":
-		return "kanjifreq", nil
-	case ".termfreq":
-		return "termfreq", nil
-	case ".txt":
-		return "zh-txt", nil
-	}
-
-	switch filepath.Base(path) {
-	case "JMdict", "JMdict.xml", "JMdict_e", "JMdict_e.xml":
-		return "edict", nil
-	case "JMnedict", "JMnedict.xml":
-		return "enamdict", nil
-	case "kanjidic2", "kanjidic2.xml":
-		return "kanjidic", nil
-	case "CATALOGS":
-		return "epwing", nil
-	}
-
-	info, err := os.Stat(path)
-	if err != nil {
-		return "", err
-	}
-
-	if info.IsDir() {
-		_, err := os.Stat(filepath.Join(path, "CATALOGS"))
-		if err == nil {
-			return "epwing", nil
-		}
-	}
-
-	return "", errors.New("unrecognized dictionary format")
-}
-
 type gloParams struct {
-	language    string
-	title       string
 	stride      int
 	pretty      bool
 	supportdict string
+	title       string
 }
