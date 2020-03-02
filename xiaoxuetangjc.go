@@ -7,9 +7,14 @@ import (
 	"strings"
 )
 
-const xxtjcRevision = "XiaoXueTang JC"
+type xxtJcConv struct {
+	revision   string
+	inputPath  string
+	outputPath string
+	gloParams
+}
 
-func xxtjcExtractTerms(reader *os.File) (terms dbTermList, err error) {
+func (*xxtJcConv) extractTerms(reader *os.File) (terms dbTermList, err error) {
 
 	for scanner := bufio.NewScanner(reader); scanner.Scan(); {
 		line := scanner.Text()
@@ -51,20 +56,20 @@ func xxtjcExtractTerms(reader *os.File) (terms dbTermList, err error) {
 	return
 }
 
-func xxtjcExportDb(inputPath, outputPath string, params gloParams) error {
-	reader, err := os.Open(inputPath)
+func (x *xxtJcConv) Export() error {
+	reader, err := os.Open(x.inputPath)
 	if err != nil {
 		return err
 	}
 	defer reader.Close()
 
-	terms, err := xxtjcExtractTerms(reader)
+	terms, err := x.extractTerms(reader)
 	if err != nil {
 		return err
 	}
 
-	if params.title == "" {
-		params.title = "XiaoXueTang JC"
+	if x.title == "" {
+		x.title = "XiaoXueTang JC"
 	}
 
 	recordData := map[string]dbRecordList{
@@ -72,12 +77,12 @@ func xxtjcExportDb(inputPath, outputPath string, params gloParams) error {
 	}
 
 	return writeDb(
-		outputPath,
-		params.title,
-		xxtjcRevision,
+		x.outputPath,
+		x.title,
+		x.revision,
 		true,
 		recordData,
-		params.stride,
-		params.pretty,
+		x.stride,
+		x.pretty,
 	)
 }

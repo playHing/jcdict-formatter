@@ -39,13 +39,28 @@ func main() {
 		log.Fatalf("dictionary path '%s' does not exist", inputPath)
 	}
 
+	fnBase := filepath.Base(inputPath)
 	if *outputPath == "" {
-		*outputPath = filepath.Join(filepath.Dir(inputPath), strings.Split(filepath.Base(inputPath), ".")[0]+"-import.zip")
+		fnDir := filepath.Dir(inputPath)
+		outfn := strings.Split(fnBase, ".")[0] + "-import.zip"
+		*outputPath = filepath.Join(fnDir, outfn)
 	}
 
 	params := gloParams{*stride, *pretty, *supportdict, ""}
 
-	if err := xxtjcExportDb(inputPath, *outputPath, params); err != nil {
+	var convertor dictConv
+	if format, err := detectFormat(fnBase); err == nil {
+		switch format {
+		case "xxtjc":
+			convertor = &xxtJcConv{"xxtjc", inputPath, *outputPath, params}
+		case "epwing":
+			convertor = &epwingConv{"epwing", inputPath, *outputPath, params}
+		}
+	} else {
+		log.Fatal(err)
+	}
+
+	if err := convertor.Export(); err != nil {
 		log.Fatalf("conversion process failed: %s", err.Error())
 	}
 }

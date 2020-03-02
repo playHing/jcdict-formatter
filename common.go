@@ -28,6 +28,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -234,4 +235,20 @@ type gloParams struct {
 	pretty      bool
 	supportdict string
 	title       string
+}
+
+type dictConv interface {
+	Export() error
+}
+
+func detectFormat(fnBase string) (string, error) {
+	fnSlice := strings.Split(fnBase, ".")
+	if len(fnSlice) > 1 && fnSlice[len(fnSlice)-1] == "txt" {
+		return "xxtjc", nil
+	}
+	if fn := strings.ToLower(fnBase); fn == "catalog" || fn == "catalogs" {
+		return "epwing", nil
+	}
+
+	return "", errors.New("only dictionary with .txt extension or with name 'catalog(s)'")
 }

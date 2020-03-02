@@ -39,6 +39,13 @@ import (
 	"strings"
 )
 
+type epwingConv struct {
+	revision   string
+	inputPath  string
+	outputPath string
+	gloParams
+}
+
 type epwingEntry struct {
 	Heading string `json:"heading"`
 	Text    string `json:"text"`
@@ -63,8 +70,8 @@ type epwingExtractor interface {
 	getRevision() string
 }
 
-func epwingExportDb(inputPath, outputPath, language, title string, stride int, pretty bool) error {
-	stat, err := os.Stat(inputPath)
+func (x *epwingConv) Export() error {
+	stat, err := os.Stat(x.inputPath)
 	if err != nil {
 		return err
 	}
@@ -72,8 +79,8 @@ func epwingExportDb(inputPath, outputPath, language, title string, stride int, p
 	var toolExec bool
 	if stat.IsDir() {
 		toolExec = true
-	} else if filepath.Base(inputPath) == "CATALOGS" {
-		inputPath = filepath.Dir(inputPath)
+	} else if filepath.Base(x.inputPath) == "CATALOGS" {
+		x.inputPath = filepath.Dir(x.inputPath)
 		toolExec = true
 	}
 
@@ -92,7 +99,7 @@ func epwingExportDb(inputPath, outputPath, language, title string, stride int, p
 			return fmt.Errorf("failed to find zero-epwing in '%s'", toolPath)
 		}
 
-		cmd := exec.Command(toolPath, "--entries", inputPath)
+		cmd := exec.Command(toolPath, "--entries", x.inputPath)
 
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
@@ -126,7 +133,7 @@ func epwingExportDb(inputPath, outputPath, language, title string, stride int, p
 
 		log.Println("completed zero-epwing processing")
 	} else {
-		data, err = ioutil.ReadFile(inputPath)
+		data, err = ioutil.ReadFile(x.inputPath)
 	}
 
 	if err != nil {
@@ -195,8 +202,8 @@ func epwingExportDb(inputPath, outputPath, language, title string, stride int, p
 		}
 	}
 
-	if title == "" {
-		title = strings.Join(titles, ", ")
+	if x.title == "" {
+		x.title = strings.Join(titles, ", ")
 	}
 
 	recordData := map[string]dbRecordList{
@@ -204,12 +211,12 @@ func epwingExportDb(inputPath, outputPath, language, title string, stride int, p
 	}
 
 	return writeDb(
-		outputPath,
-		title,
+		x.outputPath,
+		x.title,
 		strings.Join(revisions, ";"),
 		true,
 		recordData,
-		stride,
-		pretty,
+		x.stride,
+		x.pretty,
 	)
 }
