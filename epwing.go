@@ -70,72 +70,65 @@ type epwingExtractor interface {
 	getRevision() string
 }
 
-func (x *epwingConv) Export() error {
-	stat, err := os.Stat(x.inputPath)
+func (x *epwingConv) callEpwingLib() ([]byte, error) {
+
+	ex, err := os.Executable()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	var toolExec bool
-	if stat.IsDir() {
-		toolExec = true
-	} else if filepath.Base(x.inputPath) == "CATALOGS" {
-		x.inputPath = filepath.Dir(x.inputPath)
-		toolExec = true
+	toolPath := filepath.Join("bin", runtime.GOOS, "zero-epwing")
+	if runtime.GOOS == "windows" {
+		toolPath += ".exe"
 	}
+
+	toolPath = filepath.Join(filepath.Dir(ex), toolPath)
+
+	if _, err = os.Stat(toolPath); err != nil {
+		return nil, fmt.Errorf("failed to find zero-epwing in '%s'", toolPath)
+	}
+
+	cmd := exec.Command(toolPath, "--entries", x.inputPath)
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, err
+	}
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("invoking zero-epwing from '%s'...\n", toolPath)
+	if err := cmd.Start(); err != nil {
+		return nil, err
+	}
+
+	go func() {
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			log.Printf("\t > %s\n", scanner.Text())
+		}
+	}()
 
 	var data []byte
-	if toolExec {
-		toolPath := filepath.Join("bin", runtime.GOOS, "zero-epwing")
-		if runtime.GOOS == "windows" {
-			toolPath += ".exe"
-		}
-
-		if toolPath, err = filepath.Abs(toolPath); err != nil {
-			return err
-		}
-
-		if _, err = os.Stat(toolPath); err != nil {
-			return fmt.Errorf("failed to find zero-epwing in '%s'", toolPath)
-		}
-
-		cmd := exec.Command(toolPath, "--entries", x.inputPath)
-
-		stdout, err := cmd.StdoutPipe()
-		if err != nil {
-			return err
-		}
-
-		stderr, err := cmd.StderrPipe()
-		if err != nil {
-			return err
-		}
-
-		log.Printf("invoking zero-epwing from '%s'...\n", toolPath)
-		if err := cmd.Start(); err != nil {
-			return err
-		}
-
-		go func() {
-			scanner := bufio.NewScanner(stderr)
-			for scanner.Scan() {
-				log.Printf("\t > %s\n", scanner.Text())
-			}
-		}()
-
-		if data, err = ioutil.ReadAll(stdout); err != nil {
-			return err
-		}
-
-		if err := cmd.Wait(); err != nil {
-			return err
-		}
-
-		log.Println("completed zero-epwing processing")
-	} else {
-		data, err = ioutil.ReadFile(x.inputPath)
+	if data, err = ioutil.ReadAll(stdout); err != nil {
+		return nil, err
 	}
 
+	if err := cmd.Wait(); err != nil {
+		return nil, err
+	}
+
+	log.Println("completed zero-epwing processing")
+
+	return data, nil
+}
+
+func (x *epwingConv) Export() error {
+
+	data, err := x.callEpwingLib()
 	if err != nil {
 		return err
 	}
@@ -146,6 +139,7 @@ func (x *epwingConv) Export() error {
 	}
 
 	translateExp := regexp.MustCompile(`{{([nw])_(\d+)}}`)
+
 	epwingExtractors := map[string]epwingExtractor{
 		"大辞泉": makeDaijisenExtractor(),
 	}
@@ -177,7 +171,7 @@ func (x *epwingConv) Export() error {
 					code, _ := strconv.Atoi(matches[2])
 					replacement, ok := font[code]
 					if !ok {
-						replacement = "�"
+						replacement = "<?>"
 					}
 
 					str = strings.Replace(str, matches[0], replacement, -1)

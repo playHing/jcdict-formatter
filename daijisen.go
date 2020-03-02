@@ -79,9 +79,7 @@ func (e *daijisenExtractor) extractTerms(entry epwingEntry, sequence int) []dbTe
 	var tags []string
 	for _, split := range strings.Split(entry.Text, "\n") {
 		if matches := e.metaExp.FindStringSubmatch(split); matches != nil {
-			for _, tag := range strings.Split(matches[1], "・") {
-				tags = append(tags, tag)
-			}
+			tags = append(tags, strings.Split(matches[1], "・")...)
 		}
 	}
 
@@ -115,22 +113,12 @@ func (e *daijisenExtractor) extractTerms(entry epwingEntry, sequence int) []dbTe
 
 func (e *daijisenExtractor) exportRules(term *dbTerm, tags []string) {
 	for _, tag := range tags {
-		if tag == "形" {
-			term.addRules("adj-i")
-		} else if tag == "動サ変" && (strings.HasSuffix(term.Expression, "する") || strings.HasSuffix(term.Expression, "為る")) {
-			term.addRules("vs")
-		} else if term.Expression == "来る" {
-			term.addRules("vk")
-		} else if e.v5Exp.MatchString(tag) {
-			term.addRules("v5")
-		} else if e.v1Exp.MatchString(tag) {
-			term.addRules("v1")
-		}
+		term.addRules(tag)
 	}
 }
 
 func (*daijisenExtractor) getRevision() string {
-	return "daijisen1"
+	return "daijisen"
 }
 
 func (*daijisenExtractor) getFontNarrow() map[int]string {
