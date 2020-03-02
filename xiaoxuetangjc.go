@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-const zhtxtRevision = "XiaoXueTang JC"
+const xxtjcRevision = "XiaoXueTang JC"
 
-func zhtxtExtractTerms(reader *os.File) (terms dbTermList, err error) {
+func xxtjcExtractTerms(reader *os.File) (terms dbTermList, err error) {
 
 	for scanner := bufio.NewScanner(reader); scanner.Scan(); {
 		line := scanner.Text()
@@ -51,14 +51,14 @@ func zhtxtExtractTerms(reader *os.File) (terms dbTermList, err error) {
 	return
 }
 
-func zhtxtExportDb(inputPath, outputPath string, params gloParams) error {
+func xxtjcExportDb(inputPath, outputPath string, params gloParams) error {
 	reader, err := os.Open(inputPath)
 	if err != nil {
 		return err
 	}
 	defer reader.Close()
 
-	terms, err := zhtxtExtractTerms(reader)
+	terms, err := xxtjcExtractTerms(reader)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func zhtxtExportDb(inputPath, outputPath string, params gloParams) error {
 	return writeDb(
 		outputPath,
 		params.title,
-		zhtxtRevision,
+		xxtjcRevision,
 		true,
 		recordData,
 		params.stride,

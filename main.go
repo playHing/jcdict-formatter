@@ -45,7 +45,7 @@ func main() {
 
 	params := gloParams{*stride, *pretty, *supportdict, ""}
 
-	if err := zhtxtExportDb(inputPath, *outputPath, params); err != nil {
+	if err := xxtjcExportDb(inputPath, *outputPath, params); err != nil {
 		log.Fatalf("conversion process failed: %s", err.Error())
 	}
 }
