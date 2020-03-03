@@ -54,7 +54,10 @@ func main() {
 		case "xxtjc":
 			convertor = &xxtJcConv{"xxtjc", inputPath, *outputPath, params}
 		case "epwing":
-			convertor = &epwingConv{"epwing", inputPath, *outputPath, params}
+			epwingExtractors := map[string]epwingExtractor{
+				"大辞泉": makeDaijisenExtractor(),
+			}
+			convertor = &epwingConv{"epwing", inputPath, *outputPath, params, epwingExtractors}
 		}
 	} else {
 		log.Fatal(err)

@@ -30,7 +30,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -251,4 +254,16 @@ func detectFormat(fnBase string) (string, error) {
 	}
 
 	return "", errors.New("only dictionary with .txt extension or with name 'catalog(s)'")
+}
+
+func getKanji(dict, kanjiType string) map[int]string {
+	res := make(map[int]string)
+	path := path.Join("kanji", kanjiType, dict) + ".json"
+	reader, _ := os.Open(path)
+	defer reader.Close()
+	byteValue, _ := ioutil.ReadAll(reader)
+	if err := json.Unmarshal(byteValue, &res); err != nil {
+		log.Fatal("err on reading", dict, kanjiType)
+	}
+	return res
 }

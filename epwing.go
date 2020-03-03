@@ -44,6 +44,7 @@ type epwingConv struct {
 	inputPath  string
 	outputPath string
 	gloParams
+	epwingExtractors map[string]epwingExtractor
 }
 
 type epwingEntry struct {
@@ -140,10 +141,6 @@ func (x *epwingConv) Export() error {
 
 	translateExp := regexp.MustCompile(`{{([nw])_(\d+)}}`)
 
-	epwingExtractors := map[string]epwingExtractor{
-		"大辞泉": makeDaijisenExtractor(),
-	}
-
 	var (
 		terms     dbTermList
 		revisions []string
@@ -155,7 +152,7 @@ func (x *epwingConv) Export() error {
 	var sequence int
 
 	for _, subbook := range book.Subbooks {
-		if extractor, ok := epwingExtractors[subbook.Title]; ok {
+		if extractor, ok := x.epwingExtractors[subbook.Title]; ok {
 			fontNarrow := extractor.getFontNarrow()
 			fontWide := extractor.getFontWide()
 
