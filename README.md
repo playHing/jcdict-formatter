@@ -1,4 +1,4 @@
-# JCdict - JSON Formatter
+# JCdict Formatter
 
 This is a tool similar to [yomichan-import](https://github.com/FooSoft/yomichan), which turns dictionaries to the JSON format so as to be imported to [yomichan](https://github.com/FooSoft/yomichan).\
 Yet this tool is built for Chinese users, specifically 拼音(if exists) will be removed, and the part-of-speech will be shown in Chinese (e.g. 名词 instead of noun)
@@ -22,4 +22,5 @@ $ ./jcdict-formatter [path-to-XiaoXueTang-JC.txt]
 有任何问题欢迎在 issue 提问
 
 ## Todo
+- go test
 - support part-of-speech of XiaoXueTang-JC by integrating with Daijisen
