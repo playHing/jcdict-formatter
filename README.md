@@ -7,9 +7,11 @@ Yet this tool is built for Chinese users, specifically 拼音(if exists) will be
   <img src="./resource/yomichan1.png" alt="yomichan1" width="400"/>
 </p>
 
-Currently only support conversion from .txt of 小学馆中日字典 (XiaoXueTang-JC)
+Support conversions from 
+- XiaoXueTang-JC in .txt format
+- Daijisen in EPWING format (dup. from [yomichan-import](https://github.com/FooSoft/yomichan))
 
-## Usage
+## Usage (XiaoXueTang-JC)
 首先使用 [pyglossary](https://github.com/ilius/pyglossary) 把 .ifo 格式的小学馆中日字典转为 .txt 格式，然后
 ``` 
 $ git clone https://github.com/playHing/jcdict-formatter
@@ -20,5 +22,4 @@ $ ./jcdict-formatter [path-to-XiaoXueTang-JC.txt]
 有任何问题欢迎在 issue 提问
 
 ## Todo
-- integrate with Edict to support part-of-speech in XiaoXueTang-JC
-- support for zh-daijirin and zh-daijisen
+- support part-of-speech of XiaoXueTang-JC by integrating with Daijisen
