@@ -7,14 +7,14 @@ import (
 	"strings"
 )
 
-type xxtJcConv struct {
+type shougakukanJCConv struct {
 	revision   string
 	inputPath  string
 	outputPath string
 	gloParams
 }
 
-func (*xxtJcConv) extractTerms(reader *os.File) (terms dbTermList, err error) {
+func (*shougakukanJCConv) extractTerms(reader *os.File) (terms dbTermList, err error) {
 
 	for scanner := bufio.NewScanner(reader); scanner.Scan(); {
 		line := scanner.Text()
@@ -67,7 +67,7 @@ func (*xxtJcConv) extractTerms(reader *os.File) (terms dbTermList, err error) {
 	return
 }
 
-func (x *xxtJcConv) Export() error {
+func (x *shougakukanJCConv) Export() error {
 	reader, err := os.Open(x.inputPath)
 	if err != nil {
 		return err
@@ -80,7 +80,7 @@ func (x *xxtJcConv) Export() error {
 	}
 
 	if x.title == "" {
-		x.title = "XiaoXueTang JC"
+		x.title = "ShouGakuKan JC"
 	}
 
 	recordData := map[string]dbRecordList{

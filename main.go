@@ -51,8 +51,8 @@ func main() {
 	var convertor dictConv
 	if format, err := detectFormat(fnBase); err == nil {
 		switch format {
-		case "xxtjc":
-			convertor = &xxtJcConv{"xxtjc", inputPath, *outputPath, params}
+		case "shougakukanJC":
+			convertor = &shougakukanJCConv{"shougakukanJC", inputPath, *outputPath, params}
 		case "epwing":
 			epwingExtractors := map[string]epwingExtractor{
 				"大辞泉": makeDaijisenExtractor(),

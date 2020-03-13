@@ -247,7 +247,7 @@ type dictConv interface {
 func detectFormat(fnBase string) (string, error) {
 	fnSlice := strings.Split(fnBase, ".")
 	if len(fnSlice) > 1 && fnSlice[len(fnSlice)-1] == "txt" {
-		return "xxtjc", nil
+		return "shougakukanJC", nil
 	}
 	if fn := strings.ToLower(fnBase); fn == "catalog" || fn == "catalogs" {
 		return "epwing", nil
