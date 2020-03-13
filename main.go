@@ -66,4 +66,5 @@ func main() {
 	if err := convertor.Export(); err != nil {
 		log.Fatalf("conversion process failed: %s", err.Error())
 	}
+	log.Println("success.")
 }

@@ -89,6 +89,10 @@ func (x *epwingConv) callEpwingLib() ([]byte, error) {
 		return nil, fmt.Errorf("failed to find zero-epwing in '%s'", toolPath)
 	}
 
+	if filepath.Base(x.inputPath) == "CATALOGS" {
+		x.inputPath = filepath.Dir(x.inputPath)
+	}
+
 	cmd := exec.Command(toolPath, "--entries", x.inputPath)
 
 	stdout, err := cmd.StdoutPipe()
