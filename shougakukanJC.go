@@ -74,11 +74,17 @@ type pref struct {
 
 func convChinTags(tags []string) []string {
 	res := make([]string, 0)
-	chinMap := map[string]string{"vi": "自动", "vt": "他动", "n": "名词", "pn": "代名词", "adj-pn": "连体", "int": "感"}
+	chinMap := map[string]string{
+		"vi": "自动", "vt": "他动",
+		"n": "名词", "pn": "代名词",
+		"adj-i": "形一", "adj-pn": "连体",
+		"int": "感", "adj-no": "〜の",
+	}
 	prefSlice := []pref{
 		pref{"v5", "一类"}, pref{"v1", "二类"}, pref{"vs", "三类"},
-		pref{"adv", "副词"}, pref{"adj-na", "形二"}, pref{"adj", "形一"},
+		pref{"adv", "副词"}, pref{"adj-na", "形二"},
 	}
+NEXTTAG:
 	for _, tag := range tags {
 		if chin, b := chinMap[tag]; b {
 			res = appendStringUnique(res, chin)
@@ -87,7 +93,7 @@ func convChinTags(tags []string) []string {
 		for _, p := range prefSlice {
 			if strings.HasPrefix(tag, p.tag) {
 				res = appendStringUnique(res, p.chin)
-				continue
+				continue NEXTTAG
 			}
 		}
 	}

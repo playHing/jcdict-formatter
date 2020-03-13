@@ -58,7 +58,7 @@ func main() {
 	if format, err := detectFormat(fnBase); err == nil {
 		switch format {
 		case "shougakukanJC":
-			convertor = &shougakukanJCConv{"shougakukanJC", inputPath, *outputPath, params}
+			convertor = &shougakukanJCConv{"20.03.14.0", inputPath, *outputPath, params}
 		case "epwing":
 			epwingExtractors := map[string]epwingExtractor{
 				"大辞泉": makeDaijisenExtractor(),
