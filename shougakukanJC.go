@@ -46,6 +46,7 @@ func (*shougakukanJCConv) extractTerms(reader *os.File) (terms dbTermList, err e
 			parts[i] = strings.ReplaceAll(parts[i], ".", "")
 			parts[i] = strings.ReplaceAll(parts[i], ": “", "：\n“")
 			parts[i] = strings.ReplaceAll(parts[i], ",“", "\n“")
+			parts[i] = strings.ReplaceAll(parts[i], ",", "，")
 			parts[i] = strings.ReplaceAll(parts[i], ";", "；")
 
 			if strings.HasPrefix(parts[i], "$") {
