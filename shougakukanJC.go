@@ -23,7 +23,7 @@ func (*shougakukanJCConv) extractTerms(reader *os.File) (terms dbTermList, err e
 		}
 		repingyin := regexp.MustCompile(`[\p{Ll}A-Z']+`)
 		reindex := regexp.MustCompile(`（[0-9]+）`)
-		resymbol := regexp.MustCompile(`[┏]`)
+		resymbol := regexp.MustCompile(`[┏]|（）`)
 		reunrelated := regexp.MustCompile(`▼[^\n]+`)
 		parts := strings.Split(line, "\\n")
 		expparts := strings.Split(strings.Split(parts[0], "\t")[0], "|")
@@ -67,26 +67,30 @@ func (*shougakukanJCConv) extractTerms(reader *os.File) (terms dbTermList, err e
 	return
 }
 
-func convChinTags(ptags *[]string) {
-	tags := *ptags
-	chinMap := map[string]string{"vi": "自动", "vt": "他动", "n": "名词", "pn": "代名词", "adj-pn": "连体"}
-	for i, tag := range tags {
+type pref struct {
+	tag, chin string
+}
+
+func convChinTags(tags []string) []string {
+	res := make([]string, 0)
+	chinMap := map[string]string{"vi": "自动", "vt": "他动", "n": "名词", "pn": "代名词", "adj-pn": "连体", "int": "感"}
+	prefSlice := []pref{
+		pref{"v5", "一类"}, pref{"v1", "二类"}, pref{"vs", "三类"},
+		pref{"adv", "副词"}, pref{"adj-na", "形二"}, pref{"adj", "形一"},
+	}
+	for _, tag := range tags {
 		if chin, b := chinMap[tag]; b {
-			tags[i] = chin
+			res = appendStringUnique(res, chin)
 			continue
 		}
-		if strings.HasPrefix(tag, "v5") {
-			tags[i] = "一类"
-		} else if strings.HasPrefix(tag, "v1") {
-			tags[i] = "二类"
-		} else if strings.HasPrefix(tag, "adv") {
-			tags[i] = "副词"
-		} else if strings.HasPrefix(tag, "adj-na") {
-			tags[i] = "形二"
-		} else if strings.HasPrefix(tag, "adj") {
-			tags[i] = "形一"
+		for _, p := range prefSlice {
+			if strings.HasPrefix(tag, p.tag) {
+				res = appendStringUnique(res, p.chin)
+				continue
+			}
 		}
 	}
+	return res
 }
 
 func (x *shougakukanJCConv) Export() error {
@@ -109,8 +113,7 @@ func (x *shougakukanJCConv) Export() error {
 		tagsDict := SupportJMdict(sdpath)
 		for i, term := range terms {
 			if tags, b := tagsDict[term.Expression]; b {
-				convChinTags(&tags)
-				terms[i].DefinitionTags = tags
+				terms[i].DefinitionTags = convChinTags(tags)
 			}
 		}
 	}
