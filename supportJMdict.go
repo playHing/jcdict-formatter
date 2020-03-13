@@ -26,58 +26,9 @@ package main
 import (
 	"log"
 	"os"
-	"strings"
 
 	"github.com/FooSoft/jmdict"
 )
-
-const jmdictRevision = "jmdict4"
-
-func jmdictBuildRules(term *dbTerm) {
-	for _, tag := range term.DefinitionTags {
-		switch tag {
-		case "adj-i", "v1", "vk":
-			term.addRules(tag)
-		default:
-			if strings.HasPrefix(tag, "v5") {
-				term.addRules("v5")
-			} else if strings.HasPrefix(tag, "vs") {
-				term.addRules("vs")
-			}
-		}
-	}
-}
-
-func jmdictBuildScore(term *dbTerm) {
-	for _, tag := range term.DefinitionTags {
-		switch tag {
-		case "arch":
-			term.Score -= 100
-		}
-	}
-	for _, tag := range term.TermTags {
-		switch tag {
-		case "news", "ichi", "spec", "gai1":
-			term.Score += 100
-		case "P":
-			term.Score += 500
-		case "iK", "ik", "ok", "oK", "io", "oik":
-			term.Score -= 100
-		}
-	}
-}
-
-func jmdictAddPriorities(term *dbTerm, priorities ...string) {
-	for _, priority := range priorities {
-		switch priority {
-		case "news1", "ichi1", "spec1", "gai1":
-			term.addTermTags("P")
-			fallthrough
-		case "news2", "ichi2", "spec2", "gai2":
-			term.addTermTags(priority[:len(priority)-1])
-		}
-	}
-}
 
 func jmdictExtractTerms(edictEntry jmdict.JmdictEntry, language string) []dbTerm {
 	var terms []dbTerm
@@ -92,17 +43,11 @@ func jmdictExtractTerms(edictEntry jmdict.JmdictEntry, language string) []dbTerm
 
 		if kanji == nil {
 			termBase.Expression = reading.Reading
-			jmdictAddPriorities(&termBase, reading.Priorities...)
 		} else {
 			termBase.Expression = kanji.Expression
 			termBase.Reading = reading.Reading
 			termBase.addTermTags(kanji.Information...)
 
-			for _, priority := range kanji.Priorities {
-				if hasString(priority, reading.Priorities) {
-					jmdictAddPriorities(&termBase, priority)
-				}
-			}
 		}
 
 		var partsOfSpeech []string
@@ -143,9 +88,6 @@ func jmdictExtractTerms(edictEntry jmdict.JmdictEntry, language string) []dbTerm
 			term.addDefinitionTags(sense.Fields...)
 			term.addDefinitionTags(sense.Misc...)
 			term.addDefinitionTags(sense.Dialects...)
-
-			jmdictBuildRules(&term)
-			jmdictBuildScore(&term)
 
 			terms = append(terms, term)
 		}
