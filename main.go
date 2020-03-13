@@ -19,10 +19,10 @@ func usage() {
 
 func main() {
 	var (
-		outputPath  = flag.String("output-path", "", "dictionary output path")
-		stride      = flag.Int("stride", 10000, "dictionary bank stride")
+		outputPath  = flag.String("outputpath", "", "dictionary output path")
+		supportdict = flag.String("supportdict", "default", "path to support dictionary")
 		pretty      = flag.Bool("pretty", false, "output prettified dictionary JSON")
-		supportdict = flag.String("support-dict", "", "path to support dictionary")
+		stride      = flag.Int("stride", 10000, "dictionary bank stride")
 	)
 
 	flag.Usage = usage
@@ -34,6 +34,12 @@ func main() {
 	}
 
 	inputPath := flag.Arg(0)
+
+	log.Println("inputpath:", inputPath)
+	log.Println("outputpath:", *outputPath)
+	log.Println("supportdict:", *supportdict)
+	log.Println("pretty:", *pretty)
+	log.Println("stride:", *stride)
 
 	if _, err := os.Stat(inputPath); err != nil {
 		log.Fatalf("dictionary path '%s' does not exist", inputPath)

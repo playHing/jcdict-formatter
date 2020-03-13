@@ -67,6 +67,28 @@ func (*shougakukanJCConv) extractTerms(reader *os.File) (terms dbTermList, err e
 	return
 }
 
+func convChinTags(ptags *[]string) {
+	tags := *ptags
+	chinMap := map[string]string{"vi": "自动", "vt": "他动", "n": "名词", "pn": "代名词", "adj-pn": "连体"}
+	for i, tag := range tags {
+		if chin, b := chinMap[tag]; b {
+			tags[i] = chin
+			continue
+		}
+		if strings.HasPrefix(tag, "v5") {
+			tags[i] = "一类"
+		} else if strings.HasPrefix(tag, "v1") {
+			tags[i] = "二类"
+		} else if strings.HasPrefix(tag, "adv") {
+			tags[i] = "副词"
+		} else if strings.HasPrefix(tag, "adj-na") {
+			tags[i] = "形二"
+		} else if strings.HasPrefix(tag, "adj") {
+			tags[i] = "形一"
+		}
+	}
+}
+
 func (x *shougakukanJCConv) Export() error {
 	reader, err := os.Open(x.inputPath)
 	if err != nil {
@@ -81,6 +103,16 @@ func (x *shougakukanJCConv) Export() error {
 
 	if x.title == "" {
 		x.title = "ShouGakuKan JC"
+	}
+
+	if sdpath := x.gloParams.supportdict; sdpath != "" {
+		tagsDict := SupportJMdict(sdpath)
+		for i, term := range terms {
+			if tags, b := tagsDict[term.Expression]; b {
+				convChinTags(&tags)
+				terms[i].DefinitionTags = tags
+			}
+		}
 	}
 
 	recordData := map[string]dbRecordList{

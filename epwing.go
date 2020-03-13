@@ -1,8 +1,7 @@
 /*
- * Modified by: playHing <https://github.com/playHing>
-
  * Copyright (c) 2016 Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
+ * Copyright (c) 2020 playHing <https://github.com/playHing>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
