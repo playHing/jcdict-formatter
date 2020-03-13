@@ -21,7 +21,10 @@ func (*xxtJcConv) extractTerms(reader *os.File) (terms dbTermList, err error) {
 		if strings.HasPrefix(line, "##") {
 			continue
 		}
-		reg := regexp.MustCompile(`[\p{Ll}A-Z']+`)
+		repingyin := regexp.MustCompile(`[\p{Ll}A-Z']+`)
+		reindex := regexp.MustCompile(`（[0-9]+）`)
+		resymbol := regexp.MustCompile(`[┏]`)
+		reunrelated := regexp.MustCompile(`▼[^\n]+`)
 		parts := strings.Split(line, "\\n")
 		expparts := strings.Split(strings.Split(parts[0], "\t")[0], "|")
 
@@ -35,10 +38,18 @@ func (*xxtJcConv) extractTerms(reader *os.File) (terms dbTermList, err error) {
 		var glossary string
 		for i := 1; i < len(parts); i++ {
 
-			parts[i] = reg.ReplaceAllString(parts[i], "")
+			parts[i] = reindex.ReplaceAllString(parts[i], "")
+			parts[i] = repingyin.ReplaceAllString(parts[i], "")
+			parts[i] = resymbol.ReplaceAllString(parts[i], "")
+			parts[i] = reunrelated.ReplaceAllString(parts[i], "")
+
+			parts[i] = strings.ReplaceAll(parts[i], ".", "")
+			parts[i] = strings.ReplaceAll(parts[i], ": “", "：\n“")
+			parts[i] = strings.ReplaceAll(parts[i], ",“", "\n“")
+			parts[i] = strings.ReplaceAll(parts[i], ";", "；")
 
 			if strings.HasPrefix(parts[i], "$") {
-				glossary += "\n$ " + parts[i][1:]
+				glossary += "\n> " + parts[i][1:]
 			} else {
 				if glossary != "" {
 					term.Glossary = append(term.Glossary, glossary)
