@@ -62,7 +62,15 @@ func (*shougakukanJCConv) extractTerms(reader *os.File) (terms dbTermList, err e
 			term.Glossary = append(term.Glossary, glossary)
 		}
 
-		terms = append(terms, term)
+		if strings.Contains(term.Expression, "・") {
+			exps := strings.Split(term.Expression, "・")
+			for _, exp := range exps {
+				term.Expression = exp
+				terms = append(terms, term)
+			}
+		} else {
+			terms = append(terms, term)
+		}
 	}
 
 	return

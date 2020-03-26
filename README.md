@@ -20,3 +20,6 @@ $ ./jcdict-formatter --supportdict=path-to-jmdict_e path-to-ShouGakuKan-JC.txt
 ```
 再于 yomichan 中导入生成出的 .zip 文件即可\
 有任何问题欢迎在 issue 提问
+
+## Update
+2020.03.26: 等义词分离 e.g. 容れる・入れる => 容れる と 入れる
