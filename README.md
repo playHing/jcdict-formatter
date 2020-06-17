@@ -1,6 +1,6 @@
 # JCdict Formatter
 
-This is a tool similar to [yomichan-import](https://github.com/FooSoft/yomichan), which turns dictionaries to the JSON format so as to be imported to [yomichan](https://github.com/FooSoft/yomichan).\
+This is a tool similar to [yomichan-import](https://github.com/FooSoft/yomichan-import), which turns dictionaries to the JSON format so as to be imported to [yomichan](https://github.com/FooSoft/yomichan).\
 Yet this tool is built for Chinese users, specifically 拼音(if exists) are removed, and parts-of-speech are shown in Chinese (e.g. '名词' instead of 'noun' or 'n')
 
 <p align="center">
